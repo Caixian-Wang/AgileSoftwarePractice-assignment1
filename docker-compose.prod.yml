@@ -1,0 +1,42 @@
+networks:
+  profile-network:
+     driver: bridge
+
+volumes:
+  moviedata:  
+
+services:
+  # Movies API
+  api:
+    image: doconnor/movies-api:1.0
+    container_name: movies-api
+    ports:
+      - '9000:9000'
+    networks:
+      - profile-network
+    depends_on:
+      - mongo
+      - redis
+    environment:
+        MONGODB_URI: mongodb://admin:password@mongo:27017/movies
+        REDIS_URI: redis://redis
+        ENABLE_WRITING_HANDLERS: false
+
+  # MongoDB
+  mongo:
+    image: mongo:8.0-rc
+    container_name: mongoDB
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - profile-network
+    volumes:
+      - moviedata:/data/db
+
+  # Redis 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - profile-network
