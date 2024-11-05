@@ -1,6 +1,8 @@
 networks:
   profile-network:
-     driver: bridge
+    driver: bridge
+  api-redis-network:
+    driver: bridge  # Stand-alone network for API and Redis communication only
 
 volumes:
   moviedata:  
@@ -14,6 +16,7 @@ services:
       - '9000:9000'
     networks:
       - profile-network
+      - api-redis-network  # Connect the API to the Redis private network
     depends_on:
       - mongo
       - redis
@@ -39,4 +42,4 @@ services:
     image: redis:alpine
     container_name: redis
     networks:
-      - profile-network
+      - api-redis-network 
